@@ -73,18 +73,31 @@ static NSUInteger tupleCountWithObject(ZTupleBase *obj) {
     return nil;
 }
 
-- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained * _Nonnull)buffer count:(NSUInteger)len {
-    NSUInteger count = tupleCountWithObject(self);
-    if (state->state == count) {
+- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len {
+    NSUInteger count = 0;
+    NSUInteger tupleCount = tupleCountWithObject(self);
+    unsigned long countOfItemsAlreadyEnumerated = state->state;
+    
+    if (countOfItemsAlreadyEnumerated == tupleCount) {
         return 0;
     }
     
-    Ivar ivar = class_getInstanceVariable(self.class, "_first");
+    if (countOfItemsAlreadyEnumerated < tupleCount) {
+        state->itemsPtr = buffer;
+        
+        while ((countOfItemsAlreadyEnumerated < tupleCount) && (count < len)) {
+            id item = getterTable[countOfItemsAlreadyEnumerated](self);
+            if (nil != item) {
+                buffer[count] = item;
+                count++;
+            }
+            countOfItemsAlreadyEnumerated++;
+        }
+    }
     
-    state->itemsPtr = (id  _Nullable __unsafe_unretained * _Nonnull)((__bridge void *)self + ivar_getOffset(ivar));
     state->mutationsPtr = (typeof(state->mutationsPtr))&self->_hashValue;
     
-    state->state = count;
+    state->state = countOfItemsAlreadyEnumerated;
     return count;
 }
 

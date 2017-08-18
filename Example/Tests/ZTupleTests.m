@@ -171,16 +171,16 @@ describe(@"tuple tests", ^{
     
     context(@"fast enumeration", ^{
         it(@"can use for in to access tuple", ^{
-            ZTuple20 *tuple = ZTuple(@1, @2, @3, @4, @5, @6, @7, @8, @9, @10,
-                                     @11, @12, @13, @14, @15, @16, @17, @18, @19, @20);
+            ZTuple20 *tuple = ZTuple(nil, @2, @3, @4, nil, nil, @7, @8, @9, @10,
+                                     @11, @12, @13, @14, @15, @16, @17, @18, nil, @20);
             
             NSMutableArray *array = [NSMutableArray array];
             
             for(NSNumber *number in tuple) {
                 [array addObject:number];
             }
-            expect(array).to.equal(@[@1, @2, @3, @4, @5, @6, @7, @8, @9, @10,
-                                     @11, @12, @13, @14, @15, @16, @17, @18, @19, @20]);
+            expect(array).to.equal(@[@2, @3, @4, @7, @8, @9, @10,
+                                     @11, @12, @13, @14, @15, @16, @17, @18, @20]);
         });
         
         it(@"will raise error if modify any item when enumeration", ^{
